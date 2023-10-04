@@ -1035,6 +1035,7 @@ register_conv_template(
     )
 )
 
+print('zenepic version of "mythomax" template added.')
 
 if __name__ == "__main__":
     print("Vicuna template:")
