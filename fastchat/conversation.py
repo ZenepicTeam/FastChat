@@ -1032,6 +1032,7 @@ register_conv_template(
         sep_style=SeparatorStyle.ADD_COLON_TWO,
         sep="\n\n",
         sep2="</s>",
+        stop_str="###",
     )
 )
 
