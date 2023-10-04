@@ -678,6 +678,19 @@ class AlpacaAdapter(BaseModelAdapter):
         return get_conv_template("alpaca")
 
 
+
+class MythoMaxAdapter(BaseModelAdapter):
+    """The model adapter for MythoMax""" # https://huggingface.co/Gryphe/MythoMax-L2-13b
+
+    use_fast_tokenizer = False
+
+    def match(self, model_path: str):
+        return "mythomax" in model_path.lower()
+    
+    def get_default_conv_template(self, model_path: str) -> Conversation:
+        return get_conv_template("mythomax")
+    
+
 class ChatGLMAdapter(BaseModelAdapter):
     """The model adapter for THUDM/chatglm-6b, THUDM/chatglm2-6b"""
 
@@ -1684,6 +1697,7 @@ register_model_adapter(OpenLLaMaOpenInstructAdapter)
 register_model_adapter(ReaLMAdapter)
 register_model_adapter(PhindCodeLlamaAdapter)
 register_model_adapter(CodeLlamaAdapter)
+register_model_adapter(MythoMaxAdapter)
 
 # After all adapters, try the default base adapter.
 register_model_adapter(BaseModelAdapter)

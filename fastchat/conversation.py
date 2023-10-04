@@ -40,7 +40,7 @@ class Conversation:
     system_template: str = "{system_message}"
     # The system message
     system_message: str = ""
-    # The names of two roles
+    # The names of two roles (we should support 3, for system message maybe able to exist multiple times)
     roles: List[str] = (("USER", "ASSISTANT"),)
     # All messages. Each item is (role, message).
     messages: List[List[str]] = ()
@@ -55,9 +55,13 @@ class Conversation:
     # Stops generation if meeting any token in this list
     stop_token_ids: List[int] = None
 
+    def _gen_system_prompt(self) -> str:
+        """Generate the system prompt."""
+        return self.system_template.format(system_message=self.system_message)
+
     def get_prompt(self) -> str:
         """Get the prompt for generation."""
-        system_prompt = self.system_template.format(system_message=self.system_message)
+        system_prompt = self._gen_system_prompt()
         if self.sep_style == SeparatorStyle.ADD_COLON_SINGLE:
             ret = system_prompt + self.sep
             for role, message in self.messages:
@@ -215,10 +219,13 @@ class Conversation:
         else:
             raise ValueError(f"Invalid style: {self.sep_style}")
 
-    def set_system_message(self, system_message: str):
+    def set_system_message(self, system_message: str, should_append: bool = False):
         """Set the system message."""
-        self.system_message = system_message
-
+        if should_append and len(self.system_message) > 0:
+            self.system_message += self.sep + system_message
+        else:
+            self.system_message = system_message
+            
     def append_message(self, role: str, message: str):
         """Append a new message."""
         self.messages.append([role, message])
@@ -276,6 +283,7 @@ class Conversation:
             "messages": self.messages,
             "offset": self.offset,
         }
+
 
 
 # A global registry for all conversation templates
@@ -1010,6 +1018,23 @@ register_conv_template(
     )
 )
 
+# MythoMax-L2-13b (from Alpaca format)
+# source: https://huggingface.co/Gryphe/MythoMax-L2-13b
+register_conv_template(
+    Conversation(
+        name="mythomax",
+        # Note: system message are contained inside the messages passed-in
+        # system_template="{system_message}",
+        # system_message="""Enter RP mode. You shall reply to the user while staying 
+        # in character. Your responses must be detailed, creative, immersive, and drive the scenario
+        # forward.""",
+        roles=("### Instruction", "### Response"),
+        sep_style=SeparatorStyle.ADD_COLON_TWO,
+        sep="\n\n",
+        sep2="</s>",
+    )
+)
+
 
 if __name__ == "__main__":
     print("Vicuna template:")
@@ -1022,11 +1047,12 @@ if __name__ == "__main__":
 
     print("\n")
 
-    print("Llama-2 template:")
-    conv = get_conv_template("llama-2")
-    conv.set_system_message("You are a helpful, respectful and honest assistant.")
+    print("mythomax template:")
+    conv = get_conv_template("mythomax")
+    conv.set_system_message("Role play balabala.", True)
+    conv.set_system_message("Role character balabala.", True)
+    conv.set_system_message("Role action balabala.", True)
     conv.append_message(conv.roles[0], "Hello!")
-    conv.append_message(conv.roles[1], "Hi!")
-    conv.append_message(conv.roles[0], "How are you?")
     conv.append_message(conv.roles[1], None)
     print(conv.get_prompt())
+    print(conv.dict())

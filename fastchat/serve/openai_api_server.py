@@ -260,10 +260,12 @@ async def get_gen_params(
     if isinstance(messages, str):
         prompt = messages
     else:
+        # Consider messages contains multiple system message, we put only the first system message with set_system_message.
+        # For the following system messages, we simply append them as a message
         for message in messages:
             msg_role = message["role"]
             if msg_role == "system":
-                conv.set_system_message(message["content"])
+                conv.set_system_message(message["content"], True)
             elif msg_role == "user":
                 conv.append_message(conv.roles[0], message["content"])
             elif msg_role == "assistant":
