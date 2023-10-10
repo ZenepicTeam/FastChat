@@ -222,7 +222,7 @@ class Conversation:
     def set_system_message(self, system_message: str, should_append: bool = False):
         """Set the system message."""
         if should_append and len(self.system_message) > 0:
-            self.system_message += self.sep + system_message
+            self.system_message += "\n" + system_message
         else:
             self.system_message = system_message
             
@@ -1036,6 +1036,20 @@ register_conv_template(
     )
 )
 
+# chatml default template
+register_conv_template(
+    Conversation(
+        name="chatml",
+        system_template="""<|im_start|>system
+{system_message}""",
+        roles=("<|im_start|>user", "<|im_start|>assistant"),
+        sep_style=SeparatorStyle.CHATML,
+        sep="<|im_end|>",
+        stop_str="<|im_end|>",
+    )
+)
+
+
 print('zenepic version of "mythomax" template added.')
 
 if __name__ == "__main__":
@@ -1050,7 +1064,7 @@ if __name__ == "__main__":
     print("\n")
 
     print("mythomax template:")
-    conv = get_conv_template("mythomax")
+    conv = get_conv_template("chatml")
     conv.set_system_message("Role play balabala.", True)
     conv.set_system_message("Role character balabala.", True)
     conv.set_system_message("Role action balabala.", True)

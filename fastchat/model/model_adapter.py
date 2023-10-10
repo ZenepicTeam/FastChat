@@ -698,6 +698,22 @@ class MythoMaxAdapter(BaseModelAdapter):
         return get_conv_template("mythomax")
     
 
+class DolphinMistralAdapter(BaseModelAdapter):
+    """The model adapter for Mistral AI with Dolphin dataset finetuned models""" # https://huggingface.co/ehartford/dolphin-2.0-mistral-7b
+
+    def match(self, model_path: str):
+        return "dolphin" in model_path.lower() and "mistral" in model_path.lower()
+
+    def load_model(self, model_path: str, from_pretrained_kwargs: dict):
+        model, tokenizer = super().load_model(model_path, from_pretrained_kwargs)
+        model.config.eos_token_id = tokenizer.eos_token_id
+        model.config.pad_token_id = tokenizer.pad_token_id
+        return model, tokenizer
+
+    def get_default_conv_template(self, model_path: str) -> Conversation:
+        return get_conv_template("chatml")
+
+
 class ChatGLMAdapter(BaseModelAdapter):
     """The model adapter for THUDM/chatglm-6b, THUDM/chatglm2-6b"""
 
@@ -1705,6 +1721,7 @@ register_model_adapter(ReaLMAdapter)
 register_model_adapter(PhindCodeLlamaAdapter)
 register_model_adapter(CodeLlamaAdapter)
 register_model_adapter(MythoMaxAdapter)
+register_model_adapter(DolphinMistralAdapter)
 
 # After all adapters, try the default base adapter.
 register_model_adapter(BaseModelAdapter)
