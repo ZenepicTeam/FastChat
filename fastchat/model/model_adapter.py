@@ -1663,6 +1663,8 @@ class PhindCodeLlamaAdapter(CodeLlamaAdapter):
 
 # Note: the registration order matters.
 # The one registered earlier has a higher matching priority.
+register_model_adapter(MythoMaxAdapter)
+register_model_adapter(DolphinMistralAdapter)
 register_model_adapter(PeftModelAdapter)
 register_model_adapter(VicunaAdapter)
 register_model_adapter(AiroborosAdapter)
@@ -1720,8 +1722,6 @@ register_model_adapter(OpenLLaMaOpenInstructAdapter)
 register_model_adapter(ReaLMAdapter)
 register_model_adapter(PhindCodeLlamaAdapter)
 register_model_adapter(CodeLlamaAdapter)
-register_model_adapter(MythoMaxAdapter)
-register_model_adapter(DolphinMistralAdapter)
 
 # After all adapters, try the default base adapter.
 register_model_adapter(BaseModelAdapter)
